@@ -1,16 +1,18 @@
+import 'package:cocktails_jdgr/providers/drink_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:cocktails_jdgr/widgets/widgets.dart';
+import 'package:provider/provider.dart';
 
 class DetailsScreen extends StatelessWidget {
-  String _id = '1';
-  DetailsScreen.WithID(this._id, {super.key});
-  DetailsScreen({super.key}){
-    this._id = '1';
-  }
+  DetailsScreen({super.key});
   
 
   @override
   Widget build(BuildContext context) {
+
+    var id = ModalRoute.of(context)!.settings.arguments.toString();
+
+    //Provider.of<DrinkProvider>(context).getDrinkById(id);
 
     return Scaffold(
       body: CustomScrollView(
@@ -56,7 +58,7 @@ class _CustomAppBar extends StatelessWidget {
         ),
         background: const FadeInImage(
           placeholder: AssetImage('assets/loading.gif'),
-          image: NetworkImage('https://via.placeholder.com/500x300'),
+          image: NetworkImage('https://fakeimg.pl/500x300'),
           fit: BoxFit.cover,
         ),
       ),

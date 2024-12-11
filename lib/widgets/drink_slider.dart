@@ -10,8 +10,13 @@ class DrinkSlider extends StatelessWidget {
     drinkProvider = DrinkProvider.search(search, searchCategory, searchValue);
   }
 
+  DrinkSlider.simple(this.title, search, {super.key}) {
+    drinkProvider = DrinkProvider.search(search, '', '');
+  }
+
   @override
   Widget build(BuildContext context) {
+    //Provider.of<DrinkProvider>(context)
     return ChangeNotifierProvider.value(
       value: drinkProvider,
       child: SizedBox(
@@ -56,6 +61,9 @@ class DrinkPoster extends StatelessWidget {
     final imageUrl = drinks.isNotEmpty && drinks[index]['strDrinkThumb'] != null
         ? drinks[index]['strDrinkThumb']
         : 'https://via.placeholder.com/300x400';
+    final String title = drinks.isNotEmpty && drinks[index]['strDrink'] != null
+        ? drinks[index]['strDrink']
+        : 'No title';
 
     return Container(
       width: 130,
@@ -78,9 +86,9 @@ class DrinkPoster extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 5), // Espacio entre la imagen y el texto
-          const Flexible(
+          Flexible(
             child: Text(
-              'Título de la película que puede ser muy largo y necesita salto de línea',
+              title,
               style: TextStyle(fontSize: 14),
               textAlign: TextAlign.center,
               softWrap: true,

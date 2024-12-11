@@ -19,10 +19,13 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             children: [
               // Targetes principals
-              const CardSwiper(),
+              CardSwiper(10),
 
               // Slider de pel·licules
-              DrinkSlider('Pel·lícules més valorades', 'search', 's', 'margarita'),
+              DrinkSlider('Hecho con vodka', 'filter', 'i', 'vodka'),
+              DrinkSlider('Hecho con ron', 'filter', 'i', 'rum'),
+              DrinkSlider('Hecho con ginebra', 'filter', 'i', 'gin'),
+              DrinkSlider.simple('Random', 'random'),
             ],
           ),
         ),
