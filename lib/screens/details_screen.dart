@@ -79,7 +79,7 @@ class _PosterAndTitile extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             child: const FadeInImage(
               placeholder: AssetImage('assets/loading.gif'),
-              image: NetworkImage('https://via.placeholder.com/200x300'),
+              image: NetworkImage('https://fakeimg.pl/200x300'),
               height: 150,
             ),
           ),

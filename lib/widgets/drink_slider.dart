@@ -4,96 +4,84 @@ import 'package:cocktails_jdgr/providers/drink_provider.dart';
 
 class DrinkSlider extends StatelessWidget {
   final String title;
-  late final DrinkProvider drinkProvider;
+  final String search;
+  final String searchCategory;
+  final String searchValue;
 
-  DrinkSlider(this.title, search, searchCategory, searchValue, {super.key}) {
-    drinkProvider = DrinkProvider.search(search, searchCategory, searchValue);
-  }
+  DrinkSlider(this.title, this.search, this.searchCategory, this.searchValue, {super.key});
 
-  DrinkSlider.simple(this.title, search, {super.key}) {
-    drinkProvider = DrinkProvider.search(search, '', '');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    //Provider.of<DrinkProvider>(context)
-    return ChangeNotifierProvider.value(
-      value: drinkProvider,
-      child: SizedBox(
-        width: double.infinity,
-        height: 280,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(title,
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold)),
-            ),
-            const SizedBox(height: 5),
-            Expanded(
-              child: Consumer<DrinkProvider>(
-                builder: (context, provider, child) {
-                  return ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: provider.drinksList.length,
-                    itemBuilder: (_, int index) => DrinkPoster(index: index),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class DrinkPoster extends StatelessWidget {
-  final int index;
-
-  const DrinkPoster({required this.index, super.key});
+  DrinkSlider.simple(this.title, this.search, {super.key})
+      : searchCategory = '',
+        searchValue = '';
 
   @override
   Widget build(BuildContext context) {
-    final drinks = Provider.of<DrinkProvider>(context).drinksList;
-    final imageUrl = drinks.isNotEmpty && drinks[index]['strDrinkThumb'] != null
-        ? drinks[index]['strDrinkThumb']
-        : 'https://via.placeholder.com/300x400';
-    final String title = drinks.isNotEmpty && drinks[index]['strDrink'] != null
-        ? drinks[index]['strDrink']
-        : 'No title';
+    final drinkProvider = Provider.of<DrinkProvider>(context, listen: false);
 
     return Container(
-      width: 130,
-      margin: const EdgeInsets.symmetric(horizontal: 10),
+      width: double.infinity,
+      height: 280,
       child: Column(
-        mainAxisSize: MainAxisSize.min, // Ajusta el tamaño del Column al contenido
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pushNamed(context, 'details',
-                arguments: 'detalls peli'),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: FadeInImage(
-                placeholder: const AssetImage('assets/no-image.jpg'),
-                image: NetworkImage(imageUrl),
-                width: 130,
-                height: 190,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          const SizedBox(height: 5), // Espacio entre la imagen y el texto
-          Flexible(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
               title,
-              style: TextStyle(fontSize: 14),
-              textAlign: TextAlign.center,
-              softWrap: true,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(height: 5),
+          Expanded(
+            child: FutureBuilder<List<Map<String, dynamic>>>(
+              future: drinkProvider.search(search, searchCategory, searchValue),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return const Center(child: Text('Error loading drinks'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No drinks available'));
+                }
+
+                final drinks = snapshot.data!;
+
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: drinks.length,
+                  itemBuilder: (_, int index) {
+                    final imageUrl = drinks[index]['strDrinkThumb'] ?? 'https://fakeimg.pl/300x400';
+                    final id = drinks[index]['idDrink'];
+                    return GestureDetector(
+                      onTap: () => Navigator.pushNamed(context, 'details', arguments: id),
+                      child: Container(
+                        width: 130,
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: FadeInImage(
+                                placeholder: const AssetImage('assets/no-image.jpg'),
+                                image: NetworkImage(imageUrl),
+                                fit: BoxFit.cover,
+                                height: 180,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              drinks[index]['strDrink'] ?? 'No title',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],

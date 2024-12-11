@@ -6,57 +6,65 @@ import 'drinks.dart';
 class DrinkProvider extends ChangeNotifier {
   final String _baseUrl = 'www.thecocktaildb.com';
   final String _path = 'api/json/v1/1/';
-  String _search = 'random';
-  String _searchCategory = '';
-  String _searchValue = '';
-
+  final String _search = 'random';
+  final String _searchCategory = '';
+  final String _searchValue = '';
   List<Map<String, dynamic>> drinksList = [];
-
-  // un unico constructor, separar en métodos que hagan lo que estas clases, arreglar en drink slider y card swiper
 
   DrinkProvider() {
     print('DrinkProvider');
-    getDrinks();
   }
 
-  DrinkProvider.search(this._search, this._searchCategory, this._searchValue) {
+  Future<List<Map<String, dynamic>>> search(search, searchCategory, searchValue) async{
     print('DrinkProvider.search');
-    getDrinks();
-  }
+    List<Map<String, dynamic>> drinks = [];
 
-  DrinkProvider.randomSelection(int selection) {
-    print('DrinkProvider.randomSelection');
-    _search = 'random';
-    getDrink(selection);
-  }
-
-  void getDrink(int selection) async {
-    var url = Uri.https(_baseUrl, ("$_path$_search.php"), {
-      _searchCategory: _searchValue,
-    });
-
-    // Await the http get response, then decode the json-formatted response.
-    for (var i = 0; i < selection; i++) {
+    try {
+      var url = Uri.https(_baseUrl, '$_path$search.php', {
+        searchCategory: searchValue,
+      });
       var response = await http.get(url);
-      final body = jsonDecode(response.body);
-      List<Map<String, dynamic>> drinksListRandom = Drink.fromMap(body).drinks;
-      if (drinksListRandom.isNotEmpty) {
-        drinksList.add(drinksListRandom[0]);
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        drinks = Drink.fromMap(body).drinks;
+      } else {
+        throw Exception('Failed to load drinks');
       }
+    } catch (e) {
+      print('Error: $e');
+      throw Exception('Failed to load drinks');
     }
 
-    notifyListeners();
+    return drinks;
   }
 
-  void getDrinks() async {
-    var url = Uri.https(_baseUrl, ("$_path$_search.php"), {
-      _searchCategory: _searchValue,
-    });
+  Future<List<Map<String, dynamic>>> randomSelection(int selection) async {
+    print('DrinkProvider.randomSelection');
+    List<Map<String, dynamic>> drinks = [];
 
-    // Await the http get response, then decode the json-formatted response.
-    var response = await http.get(url);
-    final body = jsonDecode(response.body);
-    drinksList = Drink.fromMap(body).drinks;
-    notifyListeners();
+    try {
+      for (var i = 0; i < selection; i++) {
+        var url = Uri.https(_baseUrl, '$_path$_search.php', {
+          _searchCategory: _searchValue,
+        });
+        var response = await http.get(url);
+        if (response.statusCode == 200) {
+          final body = jsonDecode(response.body);
+          List<Map<String, dynamic>> drinksListRandom = Drink.fromMap(body).drinks;
+          if (drinksListRandom.isNotEmpty) {
+            drinks.add(drinksListRandom[0]);
+          }
+        } else {
+          throw Exception('Failed to load drinks');
+        }
+      }
+    } catch (e) {
+      print('Error: $e');
+      throw Exception('Failed to load drinks');
+    }
+
+    return drinks;
   }
+
+  
 }
