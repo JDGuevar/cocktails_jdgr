@@ -15,7 +15,8 @@ class DrinkProvider extends ChangeNotifier {
     print('DrinkProvider');
   }
 
-  Future<List<Map<String, dynamic>>> search(search, searchCategory, searchValue) async{
+  Future<List<Map<String, dynamic>>> search(
+      search, searchCategory, searchValue) async {
     print('DrinkProvider.search');
     List<Map<String, dynamic>> drinks = [];
 
@@ -50,9 +51,10 @@ class DrinkProvider extends ChangeNotifier {
         var response = await http.get(url);
         if (response.statusCode == 200) {
           final body = jsonDecode(response.body);
-          List<Map<String, dynamic>> drinksListRandom = Drink.fromMap(body).drinks;
+          List<Map<String, dynamic>> drinksListRandom =
+              Drink.fromMap(body).drinks;
           if (drinksListRandom.isNotEmpty) {
-            drinks.add(drinksListRandom[0]);
+            drinks.add(drinksListRandom[0]); //se repite a veces
           }
         } else {
           throw Exception('Failed to load drinks');
@@ -66,5 +68,26 @@ class DrinkProvider extends ChangeNotifier {
     return drinks;
   }
 
-  
+  Future<Map<String, dynamic>> getDrinkById(id) async {
+    print('DrinkProvider.getDrinkById');
+    Map<String, dynamic> drink = {};
+
+    try {
+      var url = Uri.https(_baseUrl, '$_path/lookup.php', {
+        'i': id,
+      });
+      var response = await http.get(url);
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        drink = Drink.fromMap(body).drinks[0];
+      } else {
+        throw Exception('Failed to load drink');
+      }
+    } catch (e) {
+      print('Error: $e');
+      throw Exception('Failed to load drink');
+    }
+
+    return drink;
+  }
 }

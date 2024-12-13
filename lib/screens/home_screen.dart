@@ -25,6 +25,8 @@ class HomeScreen extends StatelessWidget {
               DrinkSlider('Hecho con vodka', 'filter', 'i', 'vodka'),
               DrinkSlider('Hecho con ron', 'filter', 'i', 'rum'),
               DrinkSlider('Hecho con ginebra', 'filter', 'i', 'gin'),
+              DrinkSlider('Sin alcohol', 'filter', 'a', 'Non_Alcoholic'),
+              DrinkSlider('Vaso de Cóctel', 'filter', 'g', 'Cocktail_glass'),
               DrinkSlider.simple('Random', 'random'),
             ],
           ),
