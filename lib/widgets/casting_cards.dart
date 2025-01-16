@@ -63,7 +63,7 @@ class _CastCard extends StatelessWidget {
             height: 5,
           ),
           Text(
-            ingredient['measure']!= null && ingredient['measure']!=''
+            ingredient['measure'] != null && ingredient['measure'] != ''
              ? ingredient['ingredient'] + '\n' + ingredient['measure'] : ingredient['ingredient'],
             maxLines: 3,
             overflow: TextOverflow.ellipsis,

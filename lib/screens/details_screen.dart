@@ -1,4 +1,5 @@
 import 'package:cocktails_jdgr/providers/drink_provider.dart';
+import 'package:cocktails_jdgr/providers/favorite_provider.dart';
 import 'package:cocktails_jdgr/widgets/casting_cards.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -103,6 +104,9 @@ class _PosterAndTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final favoriteProvider = Provider.of<FavoriteProvider>(context);
+    final isFavorite = favoriteProvider.isFavorite(drink['idDrink']);
+
     return Container(
       margin: const EdgeInsets.only(top: 20),
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -123,11 +127,26 @@ class _PosterAndTitle extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  drink['strDrink'] ?? 'No title',
-                  style: textTheme.headlineMedium,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        drink['strDrink'] ?? 'No title',
+                        style: textTheme.headlineMedium,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : Colors.grey,
+                      ),
+                      onPressed: () {
+                        favoriteProvider.toggleFavorite(drink);
+                      },
+                    ),
+                  ],
                 ),
                 Text(
                   drink['strAlcoholic'] ?? 'No category',
@@ -158,6 +177,81 @@ class _Overview extends StatelessWidget {
             drink['strInstructions'] ??
             'No instructions',
         style: Theme.of(context).textTheme.bodyLarge,
+      ),
+    );
+  }
+}
+
+class CastingCards extends StatelessWidget {
+  final Map<String, dynamic> drink;
+  CastingCards({required this.drink});
+
+  List<Map<String, dynamic>> ingredients = [];
+ 
+  void getIngredients(){
+    for (var i = 1; i < 16; i++) {
+      if (drink['strIngredient$i'] != null && drink['strIngredient$i'] != '') {
+        ingredients.add({
+          'ingredient': drink['strIngredient$i'],
+          'measure': drink['strMeasure$i'],
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    getIngredients();
+    return Container(
+      margin: const EdgeInsets.only(bottom: 30),
+      width: double.infinity,
+      height: 220,
+      // color: Colors.red,
+      child: ListView.builder(
+          itemCount: ingredients.length,
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (BuildContext context, int index) => _CastCard(ingredient: ingredients[index])),
+    );
+  }
+}
+
+class _CastCard extends StatelessWidget {
+  final Map<String, dynamic> ingredient;
+
+  _CastCard({required this.ingredient});
+
+  @override
+  Widget build(BuildContext context) {
+    final imgURL = 'https://www.thecocktaildb.com/images/ingredients/${ingredient['ingredient'].replaceAll(' ', '%20')}.png';
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      width: 110,
+      height: 120,
+      // color: Colors.green,
+      child: Column(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: FadeInImage(
+              placeholder: const AssetImage('assets/no-image.jpg'),
+              image: NetworkImage(imgURL),
+              height: 140,
+              width: 100,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Text(
+            ingredient['measure'] != null && ingredient['measure'] != ''
+                ? ingredient['ingredient'] + '\n' + ingredient['measure']
+                : ingredient['ingredient'],
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          )
+        ],
       ),
     );
   }

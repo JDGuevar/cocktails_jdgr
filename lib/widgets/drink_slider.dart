@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cocktails_jdgr/providers/drink_provider.dart';
+import 'package:cocktails_jdgr/providers/favorite_provider.dart';
 
 class DrinkSlider extends StatelessWidget {
   final String title;
@@ -17,6 +18,7 @@ class DrinkSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final drinkProvider = Provider.of<DrinkProvider>(context, listen: false);
+    final favoriteProvider = Provider.of<FavoriteProvider>(context);
 
     return Container(
       width: double.infinity,
@@ -52,32 +54,48 @@ class DrinkSlider extends StatelessWidget {
                   itemBuilder: (_, int index) {
                     final imageUrl = drinks[index]['strDrinkThumb'] ?? 'https://fakeimg.pl/300x400';
                     final id = drinks[index]['idDrink'];
-                    return GestureDetector(
-                      onTap: () => Navigator.pushNamed(context, 'details', arguments: id),
-                      child: Container(
-                        width: 130,
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Column(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: FadeInImage(
-                                placeholder: const AssetImage('assets/no-image.jpg'),
-                                image: NetworkImage(imageUrl),
-                                fit: BoxFit.cover,
-                                height: 180,
-                              ),
+                    final isFavorite = favoriteProvider.isFavorite(id);
+
+                    return Stack(
+                      children: [
+                        GestureDetector(
+                          onTap: () => Navigator.pushNamed(context, 'details', arguments: id),
+                          child: Container(
+                            width: 130,
+                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Column(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: FadeInImage(
+                                    placeholder: const AssetImage('assets/no-image.jpg'),
+                                    image: NetworkImage(imageUrl),
+                                    fit: BoxFit.cover,
+                                    height: 180,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  drinks[index]['strDrink'] ?? 'No title',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 5),
-                            Text(
-                              drinks[index]['strDrink'] ?? 'No title',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        if (isFavorite)
+                          Positioned(
+                            top: 10,
+                            right: 20,
+                            child: Icon(
+                              Icons.favorite,
+                              color: Colors.red,
+                              size: 24,
+                            ),
+                          ),
+                      ],
                     );
                   },
                 );

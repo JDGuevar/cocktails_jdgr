@@ -11,25 +11,25 @@ class HomeScreen extends StatelessWidget {
         title: const Text('El rincón del bebedor'),
         elevation: 0,
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.search_outlined))
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(context, 'favorites');
+            },
+            icon: const Icon(Icons.favorite),
+          ),
         ],
       ),
       body: SingleChildScrollView(
-        child: Flexible(
-          child: Column(
-            children: [
-              // Targetes principals
-              CardSwiper(10),
-
-              // Slider de pel·licules
-              DrinkSlider('Hecho con vodka', 'filter', 'i', 'vodka'),
-              DrinkSlider('Hecho con ron', 'filter', 'i', 'rum'),
-              DrinkSlider('Hecho con ginebra', 'filter', 'i', 'gin'),
-              DrinkSlider('Sin alcohol', 'filter', 'a', 'Non_Alcoholic'),
-              DrinkSlider('Vaso de Cóctel', 'filter', 'g', 'Cocktail_glass'),
-              DrinkSlider.simple('Random', 'random'),
-            ],
-          ),
+        child: Column(
+          children: [
+            // Targetes principals
+            CardSwiper(10),
+            // Slider de pel·licules
+            DrinkSlider('Hecho con vodka', 'filter', 'i', 'vodka'),
+            DrinkSlider('Hecho con ron', 'filter', 'i', 'rum'),
+            DrinkSlider('Hecho con ginebra', 'filter', 'i', 'gin'),
+            DrinkSlider.simple('Random', 'random'),
+          ],
         ),
       ),
     );

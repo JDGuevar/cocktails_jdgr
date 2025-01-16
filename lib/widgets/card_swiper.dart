@@ -1,5 +1,6 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cocktails_jdgr/providers/drink_provider.dart';
+import 'package:cocktails_jdgr/providers/favorite_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,7 @@ class CardSwiper extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final drinkProvider = Provider.of<DrinkProvider>(context);
+    final favoriteProvider = Provider.of<FavoriteProvider>(context);
 
     return Container(
       width: double.infinity,
@@ -41,15 +43,32 @@ class CardSwiper extends StatelessWidget {
 
               final imageUrl = drinks[index]['strDrinkThumb'] ?? 'https://fakeimg.pl/300x400';
               final id = drinks[index]['idDrink'];
-              return GestureDetector(
-                onTap: () => Navigator.pushNamed(context, 'details', arguments: id),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: FadeInImage(
-                    placeholder: const AssetImage('assets/no-image.jpg'),
-                    image: NetworkImage(imageUrl),
-                    fit: BoxFit.cover,
-                  ),
+              final isFavorite = favoriteProvider.isFavorite(id);
+
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.pushNamed(context, 'details', arguments: id),
+                      child: FadeInImage(
+                        placeholder: const AssetImage('assets/no-image.jpg'),
+                        image: NetworkImage(imageUrl),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    if (isFavorite)
+                      const Positioned(
+                        top: 10,
+                        right: 20,
+                        child: Icon(
+                          Icons.favorite,
+                          color: Colors.red,
+                          size: 24,
+                        ),
+                      ),
+                  ],
                 ),
               );
             },
