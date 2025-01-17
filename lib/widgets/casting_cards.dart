@@ -4,7 +4,7 @@ class CastingCards extends StatelessWidget {
   final Map<String, dynamic> drink;
   CastingCards({required this.drink});
 
-  List<Map<String, dynamic>> ingredients = [];
+  final List<Map<String, dynamic>> ingredients = [];
  
   void getIngredients(){
     for (var i = 1; i < 16; i++) {
@@ -34,7 +34,6 @@ class CastingCards extends StatelessWidget {
 }
 
 class _CastCard extends StatelessWidget {
-
   final Map<String, dynamic> ingredient;
 
   _CastCard({required this.ingredient});
@@ -64,7 +63,8 @@ class _CastCard extends StatelessWidget {
           ),
           Text(
             ingredient['measure'] != null && ingredient['measure'] != ''
-             ? ingredient['ingredient'] + '\n' + ingredient['measure'] : ingredient['ingredient'],
+                ? ingredient['ingredient'] + '\n' + ingredient['measure']
+                : ingredient['ingredient'],
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
